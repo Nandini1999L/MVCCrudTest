@@ -1,0 +1,99 @@
+﻿@model IEnumerable<CrudOperation.Models.Employee>
+
+@{
+    ViewData["Title"] = "Employee List";
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header text-center">
+            <h4>Employee</h4>
+        </div>
+        <div class="col-lg-12">
+            <div class="card-body">
+                <div class="row">
+                    <div style="margin-bottom:12px">
+                        <a href="@Url.Action("Create", "Register")" class="btn btn-primary" style="float:right">Create</a>
+                    </div>
+                    <table class="table-bordered" id="tblhistory" style="text-align:center">
+                        <thead>
+                            <tr>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th>Address</th>
+                                <th>Phone</th>
+                                <th>Designation</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeeTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/jquery-3.7.0.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            url: "/Register/GetEmployeeDetails",
+            type: "GET",
+            datatype: "json",
+            success: function (data) {
+                var tableBody = $('#employeeTableBody');
+                tableBody.empty();
+
+                $.each(data, function (index, employee) {
+                    var row = $('<tr></tr>');
+                    row.append('<td>' + employee.FirstName + '</td>');
+                    row.append('<td>' + employee.LastName + '</td>');
+                    row.append('<td>' + employee.Age + '</td>');
+                    row.append('<td>' + employee.Gender + '</td>');
+                    row.append('<td>' + employee.Address + '</td>');
+                    row.append('<td>' + employee.Phone + '</td>');
+                    row.append('<td>' + employee.Designation + '</td>');
+                    row.append('<td><button class="btn btn-info btn-edit" data-id="' + employee.ID + '" onclick="OpenorShowEditDetails(' + employee.ID + ' )">Edit</button> <button class="btn btn-danger">Delete</button></td>');
+
+                    tableBody.append(row);
+                });
+
+                //debugger;
+                //$('.btn-edit').on('click', function () {
+                //    var employeeId = $(this).data('id');
+                //    $.ajax({
+                //        url: '/Register/Edit/' + employeeId,
+                //        type: 'GET',
+                //        datatype: 'json',
+                //        success: function (employee) {
+                //            $('#registrationForm #FirstName').val(employee.FirstName);
+                //            $('#registrationForm #LastName').val(employee.LastName);
+                //            $('#registrationForm #Age').val(employee.Age);
+                //            $('#registrationForm #Gender').val(employee.Gender);
+                //            $('#registrationForm #Address').val(employee.Address);
+                //            $('#registrationForm #Phone').val(employee.Phone);
+                //            $('#registrationForm #Designation').val(employee.Designation);
+                //            $('#registrationForm').modal('show');
+                //        },
+                //        error: function (error) {
+                //            alert('Error: ' + error.responseText);
+                //        }
+                //    });
+                //});
+            },
+            error: function (error) {
+                alert('Error: ' + error.responseText);
+            }
+        });
+    });
+
+    function OpenorShowEditDetails(employeeId) {
+        if (employeeId > 0) {
+            window.location.href = "/Register/Edit?id=" + employeeId + "";
+        }
+    }
+</script>

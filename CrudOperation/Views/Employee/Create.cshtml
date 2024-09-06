@@ -1,0 +1,198 @@
+﻿@model CrudOperation.Models.Employee
+
+@{
+    var employeeId = ViewBag.ID ?? 0;
+}
+
+<div class="form-horizontal">
+    <h4>EmployeeData</h4>
+    <hr />
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <input type="hidden" id="Id" value="@employeeId" />
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="fname">First Name</label>
+                                    <input type="text" class="form-control" id="fname">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="lname">Last Name</label>
+                                    <input type="text" class="form-control" id="lname">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="age">Age</label>
+                                    <input type="text" class="form-control" id="age">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="gender">Gender</label>
+                                    <select class="form-control" id="gender">
+                                        <option value="">Select Gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="address">Address</label>
+                                    <input type="text" class="form-control" id="address">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="phone">Phone No</label>
+                                    <input type="text" class="form-control" id="phone">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="designation">Designation</label>
+                                    <input type="text" class="form-control" id="designation">
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" id="btnsave" onclick="Savedata()">Save</button>
+                        <button class="btn btn-info" id="btnClear" hidden>Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/Scripts/jquery-3.7.0.min.js"></script>
+<script src="~/Scripts/jquery-3.7.0.intellisense.js"></script>
+<script>
+    $(document).ready(function () {
+        var employeeId = "@employeeId";
+
+        if (employeeId > 0)
+        {
+            GetEditDetails(employeeId);
+        }
+        $("#btnsave").click(function (event) {
+            event.preventDefault();
+
+          });
+    });
+
+
+        function Savedata() {
+            var employeeId = $("#Id").val();
+            var firstname = $("#fname").val();
+            var lastname = $("#lname").val();
+            var txtage = $("#age").val();
+            var txtgender = $("#gender").val();
+            var txtaddress = $("#address").val();
+            var Phone = $("#phone").val();
+            var Designation = $("#designation").val();
+
+            if (firstname == "" || firstname == null || firstname == undefined) {
+                alert("Please enter First Name");
+                $("#fname").focus();
+                return false;
+            }
+            if (lastname == "" || lastname == null || lastname == undefined) {
+                alert("Please enter last Name");
+                $("#lname").focus();
+                return false;
+            }
+
+            if (txtage == "" || txtage == null || txtage == undefined || isNaN(txtage)) {
+                alert("Please enter a valid Age");
+                $("#age").focus();
+                return false;
+            }
+
+            if (txtgender == "" || txtgender == null || txtgender == undefined) {
+                alert("Please select Gender");
+                $("#gender").focus();
+                return false;
+            }
+            if (txtaddress == "" || txtaddress == null || txtaddress == undefined) {
+                alert("Please Enter address");
+                $("address").focus();
+                return false;
+            }
+            if (Phone == "" || Phone == null || Phone == undefined || isNaN(Phone)) {
+                alert("Please enter a valid number");
+                $("phone").focus();
+                return false;
+            }
+            if (Designation == "" || Designation == null || Designation == undefined) {
+                alert("Please Enter designation");
+                $("designation").focus();
+                return false;
+            }
+            var employee = {
+                ID: employeeId,
+                FirstName: firstname,
+                LastName: lastname,
+                Age: txtage,
+                Gender: txtgender,
+                Address: txtaddress,
+                Phone: Phone,
+                Designation: Designation
+            }
+            SaveOrUpdate(employee);
+            window.location.href = ' /Employee/Index';
+        }
+
+    function SaveOrUpdate(employee) {
+        var message;
+        $.ajax({
+            type: "POST",
+            url: "/Employee/InsertUpdateEmployee",
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify(employee),
+            success: function (response) {
+                message = response;
+            },
+            error: function (response) {
+                message = response;
+
+            }
+        });
+    }
+
+    function GetEditDetails(employeeId) {
+        if (employeeId > 0) {
+            $.ajax({
+                type: "GET",
+                url: "/Employee/GetEmployeeById",
+                data: { id: employeeId },
+                dataType: "json",
+                success: function (response) {
+                    $("#fname").val(response.FirstName);
+                    $("#lname").val(response.LastName);
+                    $("#age").val(response.Age);
+                    $("#gender").val(response.Gender);
+                    $("#address").val(response.Address);
+                    $("#phone").val(response.Phone);
+                    $("#designation").val(response.Designation);
+
+                    $("#btnClear").removeAttr("hidden");
+                },
+                error: function (error) {
+                    alert('Error: ' + error.responseText);
+                }
+            });
+        }
+    }
+
+</script>
+
+

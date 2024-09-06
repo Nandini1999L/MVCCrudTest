@@ -1,0 +1,108 @@
+﻿@model IEnumerable<CrudOperation.Models.Employee>
+
+@{
+    ViewData["Title"] = "Employee List";
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header text-center">
+            <h4>Employee</h4>
+        </div>
+        <div class="col-lg-12">
+            <div class="card-body">
+                <div class="row">
+                    <div style="margin-bottom:12px">
+                        <button class="btn btn-primary" style="float:right" onclick="AddNewData()">Create</button>
+                    </div>
+                    <table class="table-bordered" id="tblhistory" style="text-align:center">
+                        <thead>
+                            <tr>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th>Address</th>
+                                <th>Phone</th>
+                                <th>Designation</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeeTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/Scripts/jquery-3.7.0.js"></script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $.ajax({
+            url: "/Employee/GetEmployeeDetails",
+            type: "GET",
+            datatype: "json",
+            success: function (data) {
+                var tableBody = $('#employeeTableBody');
+                tableBody.empty();
+
+                $.each(data, function (index, employee) {
+                    var row = $('<tr></tr>');
+                    row.append('<td>' + employee.FirstName + '</td>');
+                    row.append('<td>' + employee.LastName + '</td>');
+                    row.append('<td>' + employee.Age + '</td>');
+                    row.append('<td>' + employee.Gender + '</td>');
+                    row.append('<td>' + employee.Address + '</td>');
+                    row.append('<td>' + employee.Phone + '</td>');
+                    row.append('<td>' + employee.Designation + '</td>');
+                    row.append('<td><button class="btn btn-info btn-edit" data-id="' + employee.ID + '" onclick="OpenorShowEditDetails(' + employee.ID + ' )">Edit</button> <button class="btn btn-danger" onclick="RemoveRecord(' + employee.ID + ')">Delete</button></td>');
+
+                    tableBody.append(row);
+                });
+            },
+            error: function (error) {
+                alert('Error: ' + error.responseText);
+            }
+        });
+    });
+
+    function OpenorShowEditDetails(employeeId) {
+        if (employeeId > 0) {
+            window.location.href = "/Employee/Edit?id=" + employeeId + "";
+        }
+    }
+
+    function AddNewData() {
+        window.location.href = " /Employee/Create";
+    }
+
+
+
+    function RemoveRecord(employeeId) {
+        if (employeeId != 0) {
+            $.ajax({
+                url: "/Employee/RemoveRecord?id=" + employeeId + "",
+                type: "post",
+                datatype: "json",
+                data: { id: employeeId },
+                success: function (response) {
+                    alert(response);
+                    if (response == "") {
+                        window.location.reload();
+                    }
+                    window.location.href = "/Employee/Index ";
+                    
+                },
+                error: function (error) {
+                    alert('Error: ' + error.responseText);
+                }
+            });
+        }
+
+    }
+
+</script>
